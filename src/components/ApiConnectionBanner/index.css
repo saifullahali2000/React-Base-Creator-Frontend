@@ -1,0 +1,50 @@
+.api-conn {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  border: 1px solid var(--gen-input-border);
+}
+
+.api-conn--ok {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+.api-conn--err {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.api-conn--loading {
+  opacity: 0.85;
+}
+
+.api-conn-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+  background: #888;
+}
+
+.api-conn--ok .api-conn-dot {
+  background: #22c55e;
+}
+
+.api-conn--err .api-conn-dot {
+  background: #f87171;
+}
+
+.api-conn-code {
+  font-size: 0.72rem;
+}
+
+.api-conn-text {
+  color: var(--gen-label);
+}

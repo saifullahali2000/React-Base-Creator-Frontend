@@ -1,0 +1,513 @@
+/* VS Code–style explorer + editor; dark / light tuned for app theme */
+
+.file-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #1e1e1e;
+  color: #cccccc;
+}
+
+.fv-theme-light.file-viewer {
+  background: #ffffff;
+  color: #3b3b3b;
+}
+
+/* ── Root folder tabs (workspace) ───────────────────────── */
+.fv-folder-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  background: #252526;
+  border-bottom: 1px solid #1e1e1e;
+  flex-shrink: 0;
+}
+
+.fv-theme-light .fv-folder-tabs {
+  background: #f3f3f3;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.fv-folder-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #969696;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+
+.fv-theme-light .fv-folder-btn {
+  color: #616161;
+}
+
+.fv-folder-btn:hover {
+  color: #cccccc;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.fv-theme-light .fv-folder-btn:hover {
+  color: #1e1e1e;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.fv-folder-btn.active {
+  color: #ffffff;
+  border-bottom-color: var(--app-accent);
+  background: #2d2d2d;
+}
+
+.fv-theme-light .fv-folder-btn.active {
+  color: #1e1e1e;
+  background: #ffffff;
+  border-bottom-color: var(--app-accent);
+}
+
+/* ── Body: explorer + rail + editor ─────────────────────── */
+.fv-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.fv-explorer {
+  width: 260px;
+  min-width: 200px;
+  max-width: min(40vw, 360px);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: #252526;
+  border-right: 1px solid #1e1e1e;
+  transition:
+    width 0.22s ease,
+    min-width 0.22s ease,
+    opacity 0.18s ease;
+}
+
+.fv-theme-light .fv-explorer {
+  background: #f3f3f3;
+  border-right: 1px solid #e5e5e5;
+}
+
+.fv-body--collapsed .fv-explorer {
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  border-right: none;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fv-explorer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.55rem 0.35rem 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  color: #bbbbbb;
+  flex-shrink: 0;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.fv-theme-light .fv-explorer-header {
+  color: #616161;
+  border-bottom-color: #e5e5e5;
+}
+
+.fv-explorer-title {
+  user-select: none;
+}
+
+.fv-explorer-collapse {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #cccccc;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+
+.fv-explorer-collapse:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.fv-theme-light .fv-explorer-collapse {
+  color: #424242;
+}
+
+.fv-theme-light .fv-explorer-collapse:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.fv-explorer-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.2rem 0 0.5rem;
+  font-size: 0.78rem;
+}
+
+.fv-explorer-empty {
+  margin: 0.75rem 0.65rem;
+  font-size: 0.75rem;
+  color: #858585;
+}
+
+.fv-explorer-rail {
+  display: none;
+  flex-shrink: 0;
+  width: 22px;
+  align-self: stretch;
+  border: none;
+  border-right: 1px solid #1e1e1e;
+  background: #252526;
+  color: #cccccc;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+
+.fv-theme-light .fv-explorer-rail {
+  background: #f3f3f3;
+  border-right-color: #e5e5e5;
+  color: #424242;
+}
+
+.fv-explorer-rail:hover {
+  background: #2a2d2e;
+}
+
+.fv-theme-light .fv-explorer-rail:hover {
+  background: #e8e8e8;
+}
+
+.fv-body--collapsed .fv-explorer-rail {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.65rem;
+}
+
+/* ── Tree rows ──────────────────────────────────────────── */
+.fv-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  min-height: 26px;
+  border: none;
+  background: transparent;
+  color: #cccccc;
+  font-size: 0.78rem;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.1s ease;
+}
+
+.fv-theme-light .fv-tree-row {
+  color: #2b2b2b;
+}
+
+.fv-tree-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.fv-theme-light .fv-tree-row:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.fv-tree-row--folder {
+  font-weight: 500;
+}
+
+.fv-tree-chevron {
+  display: inline-block;
+  width: 14px;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: #858585;
+  transform: rotate(0deg);
+  transition: transform 0.15s ease;
+}
+
+.fv-tree-chevron.open {
+  transform: rotate(90deg);
+}
+
+.fv-tree-folder-icon {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  opacity: 0.95;
+}
+
+.fv-tree-file-icon {
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #858585;
+}
+
+.fv-tree-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fv-tree-row--file.active {
+  background: var(--nav-active-bg);
+  color: var(--body-text);
+}
+
+.fv-theme-light .fv-tree-row--file.active {
+  background: var(--nav-active-bg);
+  color: var(--body-text);
+}
+
+.fv-tree-row--file.active .fv-tree-file-icon {
+  color: var(--app-accent);
+}
+
+/* ── Editor / syntax ────────────────────────────────────── */
+.fv-editor {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e1e;
+}
+
+.fv-theme-light .fv-editor {
+  background: #ffffff;
+}
+
+.fv-code-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  height: 35px;
+  flex-shrink: 0;
+  background: #252526;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.fv-theme-light .fv-code-header {
+  background: #f3f3f3;
+  border-bottom-color: #e5e5e5;
+}
+
+.fv-file-path {
+  flex: 1;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #cccccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fv-theme-light .fv-file-path {
+  color: #424242;
+}
+
+.fv-lang-badge {
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  background: #3c3c3c;
+  color: #cccccc;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.fv-theme-light .fv-lang-badge {
+  background: #e0e0e0;
+  color: #424242;
+}
+
+.fv-copy-btn {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #3e3e42;
+  background: #3c3c3c;
+  color: #cccccc;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.fv-copy-btn:hover {
+  background: #505050;
+}
+
+.fv-theme-light .fv-copy-btn {
+  border-color: #d0d0d0;
+  background: #ffffff;
+  color: #424242;
+}
+
+.fv-theme-light .fv-copy-btn:hover {
+  background: #f5f5f5;
+}
+
+.fv-syntax-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: #1e1e1e;
+}
+
+.fv-theme-light .fv-syntax-wrap {
+  background: #ffffff;
+}
+
+.fv-syntax-wrap pre {
+  margin: 0 !important;
+  padding-bottom: 1rem !important;
+  white-space: pre !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.fv-code-mirror-back pre,
+.fv-code-mirror-back code {
+  white-space: pre !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.fv-syntax-empty {
+  margin: 1.5rem;
+  font-size: 0.85rem;
+  color: #858585;
+}
+
+.fv-edit-hint {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #6abf69;
+  flex-shrink: 0;
+}
+
+.fv-theme-light .fv-edit-hint {
+  color: #15803d;
+}
+
+.fv-syntax-wrap--edit {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fv-code-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+.fv-code-layer {
+  position: relative;
+  min-height: 280px;
+}
+
+.fv-code-mirror-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+  will-change: transform;
+}
+
+.fv-code-textarea--overlay {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  min-height: 280px;
+  color: transparent !important;
+  caret-color: #c9d1d9;
+  background: transparent !important;
+  resize: none;
+  overflow: hidden;
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.fv-theme-light .fv-code-textarea--overlay {
+  caret-color: #24292f;
+}
+
+.fv-code-textarea--overlay::selection {
+  background: rgba(56, 139, 253, 0.4);
+  color: transparent;
+}
+
+.fv-theme-light .fv-code-textarea--overlay::selection {
+  background: rgba(9, 105, 218, 0.28);
+}
+
+.fv-code-textarea--overlay:read-only {
+  cursor: default;
+}
+
+.fv-code-textarea {
+  width: 100%;
+  min-height: 280px;
+  margin: 0;
+  padding: 12px 12px 20px 14px;
+  border: none;
+  resize: none;
+  box-sizing: border-box;
+  font-family: 'JetBrains Mono', 'Consolas', 'Menlo', monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  tab-size: 2;
+  background: transparent;
+  color: inherit;
+  outline: none;
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.fv-code-textarea:read-only {
+  opacity: 0.9;
+  cursor: default;
+}

@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Vite build
+dist/
+dist-ssr/
+
+# Local env (secrets / machine-specific — set VITE_* in Vercel dashboard for production)
+.env.local
+.env.*.local
+
+# Vercel
+.vercel/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Test / cache
+coverage/
+.vite/
