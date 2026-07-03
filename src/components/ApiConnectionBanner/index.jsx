@@ -10,8 +10,8 @@ function resolveConnectionMode() {
   if (base) {
     try {
       const host = new URL(base).hostname.toLowerCase()
-      if (host.includes('onrender.com')) return 'Deployed backend (Render)'
-      if (host.includes('vercel.app')) return 'Deployed backend (Vercel)'
+      if (host.includes('onrender.com')) return 'Deployed backend'
+      if (host.includes('vercel.app')) return 'Deployed backend'
       if (host === 'localhost' || host === '127.0.0.1') return 'Local backend'
       return 'Remote backend'
     } catch {
