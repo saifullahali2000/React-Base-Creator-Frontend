@@ -5,9 +5,13 @@ node_modules/
 dist/
 dist-ssr/
 
-# Local env (secrets / machine-specific — set VITE_* in Vercel dashboard for production)
+# Env files — set VITE_API_BASE_URL in Vercel dashboard for production
+.env
 .env.local
+.env.development
+.env.production
 .env.*.local
+!.env.example
 
 # Vercel
 .vercel/
