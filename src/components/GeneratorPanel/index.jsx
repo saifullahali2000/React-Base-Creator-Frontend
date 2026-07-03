@@ -359,7 +359,6 @@ export default function GeneratorPanel({ onGenerate, isGenerating, status, error
             <input
               type="text"
               className="gen-input gen-input-sm"
-              value={skipTests ? 0 : testCaseCount}
               disabled={skipTests}
               aria-label="Number of test cases"
               onChange={(e) => {
