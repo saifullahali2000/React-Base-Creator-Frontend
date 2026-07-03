@@ -357,7 +357,7 @@ export default function GeneratorPanel({ onGenerate, isGenerating, status, error
           <div className="gen-test-count">
             <span className="gen-sublabel gen-sublabel-inline">Count</span>
             <input
-              type="number"
+              type="text"
               className="gen-input gen-input-sm"
               min={1}
               max={100}
