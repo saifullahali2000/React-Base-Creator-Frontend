@@ -30,7 +30,7 @@ export default function GeneratorPanel({ onGenerate, isGenerating, status, error
     return legacy || ''
   })
   const [appApiEndpoints, setAppApiEndpoints] = useState(() => localStorage.getItem('rqg_app_api_endpoints') || '')
-  const [testCaseCount, setTestCaseCount] = useState(10)
+  const [testCaseCount, setTestCaseCount] = useState("")
   const [skipTests, setSkipTests] = useState(false)
   const testCountWhenEnabledRef = useRef(10)
   const [screenshots, setScreenshots] = useState([])
