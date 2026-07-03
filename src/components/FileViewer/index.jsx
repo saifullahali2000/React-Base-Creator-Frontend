@@ -65,8 +65,30 @@ function getPrismLanguage(ext, folderTab) {
   return map[e] || 'javascript'
 }
 
+const EDITOR_FONT = "12.5px 'JetBrains Mono', Consolas, Menlo, monospace"
+const EDITOR_LINE_HEIGHT = 19.375
+const EDITOR_H_PAD = 28
+
+function measureEditorSize(text, viewportWidth) {
+  const lines = String(text ?? '').split('\n')
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  let maxW = 0
+  if (ctx) {
+    ctx.font = EDITOR_FONT
+    for (const line of lines) {
+      maxW = Math.max(maxW, ctx.measureText(line || ' ').width)
+    }
+  }
+  return {
+    width: Math.max(maxW + EDITOR_H_PAD, viewportWidth || 0, 320),
+    height: Math.max(lines.length * EDITOR_LINE_HEIGHT + 32, 280),
+  }
+}
+
 function HighlightedCodeEditor({ value, onChange, onBlur, readOnly, language, theme, fileKey }) {
   const scrollRef = useRef(null)
+  const layerRef = useRef(null)
   const taRef = useRef(null)
   const backRef = useRef(null)
   const prismStyle = theme === 'light' ? oneLight : oneDark
@@ -75,12 +97,18 @@ function HighlightedCodeEditor({ value, onChange, onBlur, readOnly, language, th
   const syncLayerHeights = useCallback(() => {
     const ta = taRef.current
     const back = backRef.current
+    const layer = layerRef.current
+    const sc = scrollRef.current
     if (!ta || !back) return
-    ta.style.height = '0'
-    const h = Math.max(ta.scrollHeight, 280)
-    ta.style.height = `${h}px`
-    back.style.minHeight = `${h}px`
-  }, [])
+
+    const { width, height } = measureEditorSize(text, sc?.clientWidth ?? 0)
+
+    if (layer) layer.style.minWidth = `${width}px`
+    ta.style.width = `${width}px`
+    ta.style.height = `${height}px`
+    back.style.minWidth = `${width}px`
+    back.style.minHeight = `${height}px`
+  }, [text])
 
   const handleScroll = useCallback(() => {
     const sc = scrollRef.current
@@ -89,14 +117,38 @@ function HighlightedCodeEditor({ value, onChange, onBlur, readOnly, language, th
     back.style.transform = `translate(${-sc.scrollLeft}px, ${-sc.scrollTop}px)`
   }, [])
 
+  const handleWheel = useCallback(
+    (e) => {
+      const sc = scrollRef.current
+      if (!sc) return
+      if (sc.scrollHeight <= sc.clientHeight && sc.scrollWidth <= sc.clientWidth) return
+      sc.scrollTop += e.deltaY
+      sc.scrollLeft += e.deltaX
+      handleScroll()
+      e.preventDefault()
+    },
+    [handleScroll],
+  )
+
   useLayoutEffect(() => {
     syncLayerHeights()
     handleScroll()
   }, [fileKey, language, text, syncLayerHeights, handleScroll])
 
+  useEffect(() => {
+    const sc = scrollRef.current
+    if (!sc || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(() => {
+      syncLayerHeights()
+      handleScroll()
+    })
+    ro.observe(sc)
+    return () => ro.disconnect()
+  }, [syncLayerHeights, handleScroll])
+
   return (
     <div ref={scrollRef} className="fv-code-scroll" onScroll={handleScroll}>
-      <div className="fv-code-layer">
+      <div ref={layerRef} className="fv-code-layer">
         <div ref={backRef} className="fv-code-mirror-back" aria-hidden>
           <SyntaxHighlighter
             PreTag="div"
@@ -134,6 +186,7 @@ function HighlightedCodeEditor({ value, onChange, onBlur, readOnly, language, th
           value={text}
           onChange={onChange}
           onBlur={onBlur}
+          onWheel={handleWheel}
           aria-label="Source editor"
         />
       </div>
@@ -482,10 +535,24 @@ export default function FileViewer({ files, assessmentMode = 'topin_base', onSou
             <button
               type="button"
               className="fv-copy-btn"
-              onClick={() => navigator.clipboard?.writeText(fileBody)}
-              title="Copy to clipboard"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(fileBody)
+                } catch {
+                  const ta = document.createElement('textarea')
+                  ta.value = fileBody
+                  ta.setAttribute('readonly', '')
+                  ta.style.position = 'fixed'
+                  ta.style.left = '-9999px'
+                  document.body.appendChild(ta)
+                  ta.select()
+                  document.execCommand('copy')
+                  document.body.removeChild(ta)
+                }
+              }}
+              title="Copy entire file to clipboard"
             >
-              Copy
+              Copy all
             </button>
           </div>
           <div className="fv-syntax-wrap fv-syntax-wrap--edit">

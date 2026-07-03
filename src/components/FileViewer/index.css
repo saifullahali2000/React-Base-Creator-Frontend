@@ -300,9 +300,11 @@
 .fv-editor {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: #1e1e1e;
+  overflow: hidden;
 }
 
 .fv-theme-light .fv-editor {
@@ -428,37 +430,48 @@
 .fv-syntax-wrap--edit {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
 .fv-code-scroll {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   overflow: auto;
   position: relative;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .fv-code-layer {
   position: relative;
   min-height: 280px;
+  display: block;
 }
 
 .fv-code-mirror-back {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
   pointer-events: none;
   z-index: 0;
   overflow: visible;
   will-change: transform;
 }
 
+.fv-code-mirror-back pre,
+.fv-code-mirror-back code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+}
+
 .fv-code-textarea--overlay {
   position: relative;
   z-index: 1;
   display: block;
-  width: 100%;
   min-height: 280px;
   color: transparent !important;
   caret-color: #c9d1d9;
@@ -468,6 +481,8 @@
   white-space: pre;
   overflow-wrap: normal;
   word-break: normal;
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .fv-theme-light .fv-code-textarea--overlay {
