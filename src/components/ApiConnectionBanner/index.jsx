@@ -2,16 +2,41 @@ import { useEffect, useState } from 'react'
 import { apiUrl, getApiBaseUrl } from '../../config.js'
 import './index.css'
 
+function resolveConnectionMode() {
+  const base = getApiBaseUrl()
+  const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV
+  const proxyTarget = isDev ? String(import.meta.env?.VITE_API_PROXY_TARGET || '').trim() : ''
+
+  if (base) {
+    try {
+      const host = new URL(base).hostname.toLowerCase()
+      if (host.includes('onrender.com')) return 'Deployed backend (Render)'
+      if (host.includes('vercel.app')) return 'Deployed backend (Vercel)'
+      if (host === 'localhost' || host === '127.0.0.1') return 'Local backend'
+      return 'Remote backend'
+    } catch {
+      return 'Remote backend'
+    }
+  }
+
+  if (proxyTarget) {
+    try {
+      const host = new URL(proxyTarget).hostname.toLowerCase()
+      if (host === 'localhost' || host === '127.0.0.1') return 'Local backend (dev proxy)'
+      return 'Remote backend (dev proxy)'
+    } catch {
+      return 'Dev proxy'
+    }
+  }
+
+  return 'Same-origin API'
+}
+
 export default function ApiConnectionBanner() {
   const [state, setState] = useState({ loading: true, ok: false, detail: '' })
 
-  const base = getApiBaseUrl()
   const healthUrl = apiUrl('/api/health')
-  const proxyTarget =
-    typeof import.meta !== 'undefined' && import.meta.env?.DEV
-      ? String(import.meta.env.VITE_API_PROXY_TARGET || '').trim()
-      : ''
-  const label = base || (proxyTarget ? `dev proxy → ${proxyTarget}` : '(same origin)')
+  const modeLabel = resolveConnectionMode()
 
   useEffect(() => {
     let cancelled = false
@@ -22,14 +47,14 @@ export default function ApiConnectionBanner() {
         const text = await res.text()
         if (cancelled) return
         if (res.ok && text.includes('"ok"')) {
-          setState({ loading: false, ok: true, detail: 'API reachable' })
+          setState({ loading: false, ok: true, detail: 'Connected — ready to generate' })
           return
         }
         if (/FUNCTION_INVOCATION_FAILED|INTERNAL_SERVER_ERROR/i.test(text)) {
           setState({
             loading: false,
             ok: false,
-            detail: 'API function crashed on the server (500). Redeploy backend with latest code.',
+            detail: 'Backend error (500). Redeploy the API service and try again.',
           })
           return
         }
@@ -37,24 +62,24 @@ export default function ApiConnectionBanner() {
           setState({
             loading: false,
             ok: false,
-            detail:
-              'Gateway timeout (504) — Vercel cold start or slow boot. Wait and retry, redeploy backend with latest api/health.mjs, or use VITE_API_PROXY_TARGET=http://localhost:3001 locally.',
+            detail: 'Backend timed out (504). Wait a moment and retry — free tiers can be slow on first request.',
           })
           return
         }
         setState({
           loading: false,
           ok: false,
-          detail: `Upstream API returned ${res.status} (Vite proxied to ${proxyTarget || 'backend'}). Check the backend deploy, or set VITE_API_PROXY_TARGET=http://localhost:3001 and run cd backend && npm start.`,
+          detail: `Backend unavailable (${res.status}). Check that the API service is running.`,
         })
       } catch (err) {
         if (!cancelled) {
           setState({
             loading: false,
             ok: false,
-            detail: err.message === 'Failed to fetch'
-              ? 'Cannot reach API — restart npm run dev after .env changes, or check VITE_API_PROXY_TARGET.'
-              : err.message,
+            detail:
+              err.message === 'Failed to fetch'
+                ? 'Cannot reach the backend. Check your connection or API configuration.'
+                : err.message,
           })
         }
       }
@@ -72,8 +97,8 @@ export default function ApiConnectionBanner() {
     >
       <span className="api-conn-dot" aria-hidden />
       <span className="api-conn-text">
-        API <code className="api-conn-code">{label}</code>
-        {state.loading ? ' — checking…' : ` — ${state.detail}`}
+        <span className="api-conn-mode">{modeLabel}</span>
+        {state.loading ? ' — Checking connection…' : ` — ${state.detail}`}
       </span>
     </div>
   )

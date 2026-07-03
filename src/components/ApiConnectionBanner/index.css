@@ -41,8 +41,9 @@
   background: #f87171;
 }
 
-.api-conn-code {
-  font-size: 0.72rem;
+.api-conn-mode {
+  font-weight: 600;
+  color: var(--gen-label);
 }
 
 .api-conn-text {
