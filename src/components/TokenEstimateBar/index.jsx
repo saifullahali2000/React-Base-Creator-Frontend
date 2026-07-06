@@ -34,9 +34,19 @@ export default function TokenEstimateBar({ estimate, loading, error, partial }) 
             <h4 className="token-est-col-title">Backend prompt</h4>
             {backend ? (
               <>
-                <Row label="System prompt" value={backend.systemPrompt} />
+                <Row label="System prompt (total)" value={backend.systemPrompt} />
+                <Row
+                  label="README template (in system)"
+                  value={backend.readmeTemplate ?? 0}
+                />
+                <Row label="Other system rules" value={backend.systemPromptWithoutReadme ?? 0} muted />
                 <Row label="Prompt template" value={backend.promptWrapper} muted />
                 <Row label="User message (built)" value={backend.userRequestTotal} />
+                {estimate?.promptMeta && !estimate.promptMeta.readmeLoaded ? (
+                  <p className="token-est-warn">
+                    README template not loaded on this backend — redeploy with Sample_Folder or run locally.
+                  </p>
+                ) : null}
               </>
             ) : (
               <p className="token-est-wait">Waiting for backend estimate…</p>

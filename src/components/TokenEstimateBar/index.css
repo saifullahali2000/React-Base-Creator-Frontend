@@ -92,6 +92,13 @@
   color: var(--gen-hint, #888);
 }
 
+.token-est-warn {
+  margin: 0.45rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: #f59e0b;
+}
+
 .token-est-error {
   margin: 0 0 0.35rem;
   font-size: 0.78rem;
