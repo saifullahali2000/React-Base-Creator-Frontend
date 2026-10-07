@@ -32,6 +32,10 @@ function resolveConnectionMode() {
   return 'Same-origin API'
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 export default function ApiConnectionBanner() {
   const [state, setState] = useState({ loading: true, ok: false, detail: '' })
 
@@ -41,38 +45,50 @@ export default function ApiConnectionBanner() {
   useEffect(() => {
     let cancelled = false
     async function check() {
-      setState({ loading: true, ok: false, detail: '' })
-      try {
-        const res = await fetch(healthUrl, { cache: 'no-store' })
-        const text = await res.text()
+      const maxAttempts = 15
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
         if (cancelled) return
-        if (res.ok && text.includes('"ok"')) {
-          setState({ loading: false, ok: true, detail: 'Connected — ready to generate' })
-          return
-        }
-        if (/FUNCTION_INVOCATION_FAILED|INTERNAL_SERVER_ERROR/i.test(text)) {
+        setState({ loading: true, ok: false, detail: '' })
+        try {
+          const res = await fetch(healthUrl, { cache: 'no-store' })
+          const text = await res.text()
+          if (cancelled) return
+          if (res.ok && text.includes('"ok"')) {
+            setState({ loading: false, ok: true, detail: 'Connected — ready to generate' })
+            return
+          }
+          if (res.status === 503 && attempt < maxAttempts) {
+            await sleep(400)
+            continue
+          }
+          if (/FUNCTION_INVOCATION_FAILED|INTERNAL_SERVER_ERROR/i.test(text)) {
+            setState({
+              loading: false,
+              ok: false,
+              detail: 'Backend error (500). Redeploy the API service and try again.',
+            })
+            return
+          }
+          if (res.status === 504) {
+            setState({
+              loading: false,
+              ok: false,
+              detail: 'Backend timed out (504). Wait a moment and retry — free tiers can be slow on first request.',
+            })
+            return
+          }
           setState({
             loading: false,
             ok: false,
-            detail: 'Backend error (500). Redeploy the API service and try again.',
+            detail: `Backend unavailable (${res.status}). Check that the API service is running.`,
           })
           return
-        }
-        if (res.status === 504) {
-          setState({
-            loading: false,
-            ok: false,
-            detail: 'Backend timed out (504). Wait a moment and retry — free tiers can be slow on first request.',
-          })
-          return
-        }
-        setState({
-          loading: false,
-          ok: false,
-          detail: `Backend unavailable (${res.status}). Check that the API service is running.`,
-        })
-      } catch (err) {
-        if (!cancelled) {
+        } catch (err) {
+          if (cancelled) return
+          if (attempt < maxAttempts) {
+            await sleep(400)
+            continue
+          }
           setState({
             loading: false,
             ok: false,
