@@ -15,7 +15,7 @@ export const MODELS_BY_PROVIDER = {
     { value: 'claude-sonnet-4-6', label: 'Sonnet 4.6 — Best Quality', group: 'Anthropic' },
   ],
   gemini: [
-    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash — best for free tier', group: 'Google' },
+    { value: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash — current default', group: 'Google' },
     { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash — free tier friendly', group: 'Google' },
     { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro — usually needs paid billing', group: 'Google' },
   ],
@@ -37,18 +37,11 @@ export const MODELS_BY_PROVIDER = {
 
 /** Shown until the live Cursor catalog loads (from GET /v1/models) */
 export const CURSOR_FALLBACK_MODELS = [
-  { value: 'composer-2', label: 'Composer 2 — Cursor agent model', group: 'Cursor' },
-  {
-    value: 'claude-4.6-sonnet-thinking',
-    label: 'Claude 4.6 Sonnet (Thinking)',
-    group: 'Cursor',
-  },
-  {
-    value: 'claude-4.5-sonnet-thinking',
-    label: 'Claude 4.5 Sonnet (Thinking)',
-    group: 'Cursor',
-  },
-  { value: 'claude-4-sonnet-thinking', label: 'Claude 4 Sonnet (Thinking)', group: 'Cursor' },
+  { value: 'composer-2.5', label: 'Composer 2.5 — Cursor agent model', group: 'Cursor' },
+  { value: 'claude-sonnet-4-5', label: 'Claude Sonnet 4.5', group: 'Cursor' },
+  { value: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', group: 'Cursor' },
+  { value: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5', group: 'Cursor' },
+  { value: 'claude-opus-4-5', label: 'Claude Opus 4.5', group: 'Cursor' },
   { value: 'gpt-5.2', label: 'GPT-5.2', group: 'Cursor' },
 ]
 
@@ -64,10 +57,10 @@ export const OPENROUTER_FALLBACK_MODELS = [
 
 export const DEFAULT_MODEL_BY_PROVIDER = {
   claude: 'claude-haiku-4-5-20251001',
-  gemini: 'gemini-2.0-flash',
+  gemini: 'gemini-3.8-flash',
   deepseek: 'deepseek-v4-flash',
   grok: 'grok-3-mini',
-  cursor: 'composer-2',
+  cursor: 'composer-2.5',
   openrouter: 'google/gemini-2.0-flash-001',
 }
 
